@@ -3,66 +3,47 @@ import sys
 
 TERMINATORS = {"jmp", "br", "ret"}
 
-def form_blocks(instrs):
-    blocks, cur, label2block = [], [], {}
+def split_blocks(instrs):
+    blocks, cur, labels = [], [], {}
     def flush():
         nonlocal cur
-        if not cur:
-            return
+        if not cur: return
         first = cur[0]
-        name = first.get("label") if "label" in first else f"@B{len(blocks)}"
+        name = first.get("label", f"@B{len(blocks)}")
         blocks.append({"name": name, "instrs": cur})
-        if "label" in first:
-            label2block[first["label"]] = name
+        if "label" in first: labels[first["label"]] = name
         cur = []
-
     for ins in instrs:
-        if "label" in ins and cur:
-            flush()
+        if "label" in ins and cur: flush()
         cur.append(ins)
-        if ins.get("op") in TERMINATORS:
-            flush()
+        if ins.get("op") in TERMINATORS: flush()
     flush()
-    return blocks, label2block
+    return blocks, labels
 
-def build_cfg(blocks, label2block):
+def build_succ(blocks, labels):
     succ = {b["name"]: [] for b in blocks}
     for i, b in enumerate(blocks):
-        if not b["instrs"]:
-            continue
+        if not b["instrs"]: continue
         last = b["instrs"][-1]
         op = last.get("op")
         if op == "jmp":
-            target = last["labels"][0]
-            succ[b["name"]].append(label2block.get(target, target))
+            succ[b["name"]].append(labels.get(last["labels"][0], last["labels"][0]))
         elif op == "br":
             t, f = last["labels"][:2]
-            succ[b["name"]].append(label2block.get(t, t))
-            succ[b["name"]].append(label2block.get(f, f))
-        elif op == "ret":
-            pass  # no successors
-        else:
-            if i + 1 < len(blocks):
-                succ[b["name"]].append(blocks[i + 1]["name"])
+            succ[b["name"]].extend([labels.get(t, t), labels.get(f, f)])
+        elif op != "ret" and i+1 < len(blocks):
+            succ[b["name"]].append(blocks[i+1]["name"])
     return succ
 
 def mycfg():
     prog = json.load(sys.stdin)
     for func in prog.get("functions", []):
-        blocks, label2block = form_blocks(func.get("instrs", []))
-        succ = build_cfg(blocks, label2block)
-
+        blocks, labels = split_blocks(func.get("instrs", []))
+        succ = build_succ(blocks, labels)
         print(f"Function {func['name']}:")
-        print("  Blocks:", ", ".join(b["name"] for b in blocks))
-        print("  Entry:", blocks[0]["name"] if blocks else "(none)")
-        print("  Edges:")
         for b in blocks:
             outs = succ[b["name"]]
-            if outs:
-                print(f"    {b['name']} -> {', '.join(outs)}")
-            else:
-                print(f"    {b['name']} -> (exit)")
-        print()
+            print(f"  {b['name']} -> {', '.join(outs) if outs else '(exit)'}")
 
 if __name__ == "__main__":
     mycfg()
