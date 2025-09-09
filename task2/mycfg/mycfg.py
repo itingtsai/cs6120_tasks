@@ -4,13 +4,6 @@ import sys
 TERMINATORS = {"jmp", "br", "ret"}
 
 def form_blocks(instrs):
-    """
-    Split instructions into basic blocks.
-    A new block starts at:
-      - the first instruction,
-      - any labeled instruction,
-      - the instruction after a terminator (jmp/br/ret).
-    """
     blocks, cur, label2block = [], [], {}
     def flush():
         nonlocal cur
@@ -33,9 +26,6 @@ def form_blocks(instrs):
     return blocks, label2block
 
 def build_cfg(blocks, label2block):
-    """
-    Build successors for each block.
-    """
     succ = {b["name"]: [] for b in blocks}
     for i, b in enumerate(blocks):
         if not b["instrs"]:
