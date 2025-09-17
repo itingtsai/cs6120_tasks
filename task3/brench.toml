@@ -1,0 +1,41 @@
+extract = 'total_dyn_inst: (\d+)'
+
+benchmarks = [
+  "benchmarks/core/armstrong.bril",
+  "benchmarks/core/ackermann.bril",
+  "benchmarks/core/sum-to-ten.bril",
+  "benchmarks/core/sum-check.bril",
+  "benchmarks/core/triangle.bril",
+  "benchmarks/core/sum-sq-diff.bril",
+  "benchmarks/core/perfect.bril",
+  "benchmarks/core/mountain.bril",
+  "benchmarks/core/dead-branch.bril",
+]
+
+[runs.baseline]
+pipeline = [
+  "bril2json",
+  "brili -p {args}",
+]
+
+[runs.lvn]
+pipeline = [
+  "bril2json",
+  "python3 task3/new_lvn.py",
+  "brili -p {args}",
+]
+
+[runs.tdce]
+pipeline = [
+  "bril2json",
+  "python3 task3/new_tdce.py",
+  "brili -p {args}",
+]
+
+[runs.lvn_tdce]
+pipeline = [
+  "bril2json",
+  "python3 task3/new_lvn.py",
+  "python3 task3/new_tdce.py",
+  "brili -p {args}",
+]
