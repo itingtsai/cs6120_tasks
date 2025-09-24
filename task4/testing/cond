@@ -1,0 +1,79 @@
+// Control Flow Graph
+digraph {
+	f0_b0 [label="── IN ──
+(empty)
+
+── BLOCK ──
+[0] a: int = const 47
+[1] b: int = const 42
+[2] cond: bool = const true
+[3] br cond .left .right
+
+── OUT ──
+[0] a: int = const 47
+[1] b: int = const 42
+[2] cond: bool = const true
+" fontname=monospace shape=rectangle]
+	f0_b1 [label="── IN ──
+[0] a: int = const 47
+[1] b: int = const 42
+[2] cond: bool = const true
+
+── BLOCK ──
+[4] .left:
+[5] b: int = const 1
+[6] c: int = const 5
+[7] jmp .end
+
+── OUT ──
+[0] a: int = const 47
+[2] cond: bool = const true
+[5] b: int = const 1
+[6] c: int = const 5
+" fontname=monospace shape=rectangle]
+	f0_b2 [label="── IN ──
+[0] a: int = const 47
+[1] b: int = const 42
+[2] cond: bool = const true
+
+── BLOCK ──
+[8] .right:
+[9] a: int = const 2
+[10] c: int = const 10
+[11] jmp .end
+
+── OUT ──
+[1] b: int = const 42
+[2] cond: bool = const true
+[9] a: int = const 2
+[10] c: int = const 10
+" fontname=monospace shape=rectangle]
+	f0_b3 [label="── IN ──
+[0] a: int = const 47
+[2] cond: bool = const true
+[5] b: int = const 1
+[6] c: int = const 5
+[1] b: int = const 42
+[9] a: int = const 2
+[10] c: int = const 10
+
+── BLOCK ──
+[12] .end:
+[13] d: int = sub a c
+[14] print d
+
+── OUT ──
+[0] a: int = const 47
+[2] cond: bool = const true
+[5] b: int = const 1
+[6] c: int = const 5
+[1] b: int = const 42
+[9] a: int = const 2
+[10] c: int = const 10
+[13] d: int = sub a c
+" fontname=monospace shape=rectangle]
+	f0_b0 -> f0_b1
+	f0_b0 -> f0_b2
+	f0_b1 -> f0_b3
+	f0_b2 -> f0_b3
+}

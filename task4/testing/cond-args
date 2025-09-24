@@ -1,0 +1,78 @@
+// Control Flow Graph
+digraph {
+	f0_b0 [label="── IN ──
+param: cond
+
+── BLOCK ──
+[0] a: int = const 47
+[1] b: int = const 42
+[2] br cond .left .right
+
+── OUT ──
+param: cond
+[0] a: int = const 47
+[1] b: int = const 42
+" fontname=monospace shape=rectangle]
+	f0_b1 [label="── IN ──
+param: cond
+[0] a: int = const 47
+[1] b: int = const 42
+
+── BLOCK ──
+[3] .left:
+[4] b: int = const 1
+[5] c: int = const 5
+[6] jmp .end
+
+── OUT ──
+param: cond
+[0] a: int = const 47
+[4] b: int = const 1
+[5] c: int = const 5
+" fontname=monospace shape=rectangle]
+	f0_b2 [label="── IN ──
+param: cond
+[0] a: int = const 47
+[1] b: int = const 42
+
+── BLOCK ──
+[7] .right:
+[8] a: int = const 2
+[9] c: int = const 10
+[10] jmp .end
+
+── OUT ──
+param: cond
+[1] b: int = const 42
+[8] a: int = const 2
+[9] c: int = const 10
+" fontname=monospace shape=rectangle]
+	f0_b3 [label="── IN ──
+param: cond
+[0] a: int = const 47
+[4] b: int = const 1
+[5] c: int = const 5
+[1] b: int = const 42
+[8] a: int = const 2
+[9] c: int = const 10
+
+── BLOCK ──
+[11] .end:
+[12] d: int = sub a c
+[13] print d
+
+── OUT ──
+param: cond
+[0] a: int = const 47
+[4] b: int = const 1
+[5] c: int = const 5
+[1] b: int = const 42
+[8] a: int = const 2
+[9] c: int = const 10
+[12] d: int = sub a c
+" fontname=monospace shape=rectangle]
+	f0_b0 -> f0_b1
+	f0_b0 -> f0_b2
+	f0_b1 -> f0_b3
+	f0_b2 -> f0_b3
+}
