@@ -32,11 +32,11 @@ struct FDivDetectorPass : public PassInfoMixin<FDivDetectorPass> {
         }
         
         // print how many floating-point operations in total
-        errs() << "Found " << fdivCount << " FDiv operations in module\n";
+        errs() << "Found " << fdivCount << " floating-point division operations in module\n";
         
         // If no FDiv operations, return early WITHOUT creating global variables
         if (fdivCount == 0) {
-            errs() << "No FDiv operations found.\n";
+            errs() << "No floating-point division operations found.\n";
             return PreservedAnalyses::all();
         }
         
