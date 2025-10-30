@@ -151,7 +151,7 @@ struct SkeletonPass : public PassInfoMixin<SkeletonPass> {
                         // Step 4: Hoist instructions to preheader
                         auto preheader = Loop->getLoopPreheader();
                         for (auto *Inst : HoistableInstructions) {
-                            Inst->moveBefore(preheader->getTerminator());
+                            Inst->moveBefore(preheader->getTerminator()->getIterator());
                         }
                     }
                 }
@@ -171,6 +171,18 @@ llvmGetPassPluginInfo() {
         .PluginName = "Skeleton pass",
         .PluginVersion = "v0.1",
         .RegisterPassBuilderCallbacks = [](PassBuilder &PB) {
+            // Register the pass by name so it can be invoked with -passes=
+            PB.registerPipelineParsingCallback(
+                [](StringRef Name, ModulePassManager &MPM,
+                   ArrayRef<PassBuilder::PipelineElement>) {
+                    if (Name == "skeleton-pass") {
+                        MPM.addPass(SkeletonPass());
+                        return true;
+                    }
+                    return false;
+                });
+            
+            // Also register it to run automatically at pipeline start
             PB.registerPipelineStartEPCallback(
                 [](ModulePassManager &MPM, OptimizationLevel Level) {
                     MPM.addPass(SkeletonPass());
